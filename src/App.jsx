@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { films, cinemas } from './data/films'
 import { useGeolocation } from './hooks/useGeolocation'
+import { useNow } from './hooks/useNow'
 import { nearestCinema, isPast, isNow } from './utils/distance'
 import { SYNTAGMA } from './constants'
 import LocationBanner from './components/LocationBanner'
@@ -9,6 +10,7 @@ import FilmCard from './components/FilmCard'
 
 export default function App() {
   const { lat, lng, status } = useGeolocation()
+  const { tick, dayExpired } = useNow()
   const [timeFilter, setTimeFilter] = useState('all')
   const [summerOnly, setSummerOnly] = useState(false)
 
@@ -16,6 +18,7 @@ export default function App() {
   const userLng = lng ?? SYNTAGMA.lng
 
   const processedFilms = useMemo(() => {
+    if (dayExpired) return []
     return films
       .map((film) => {
         // 1. Optionally restrict to summer-cinema showtimes
@@ -48,7 +51,7 @@ export default function App() {
         if (status !== 'granted') return 0
         return (a.nearest?.distanceKm ?? Infinity) - (b.nearest?.distanceKm ?? Infinity)
       })
-  }, [summerOnly, timeFilter, userLat, userLng, status])
+  }, [summerOnly, timeFilter, userLat, userLng, status, tick, dayExpired])
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -77,7 +80,9 @@ export default function App() {
         {/* Film list */}
         {processedFilms.length === 0 ? (
           <div className="rounded-xl bg-gray-800 px-6 py-12 text-center text-gray-400">
-            {summerOnly
+            {dayExpired
+              ? 'Showings have ended for today — reload to see today\'s schedule'
+              : summerOnly
               ? '☀️ No summer cinema showings'
               : 'No films match the current filters'}
           </div>
