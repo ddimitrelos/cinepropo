@@ -3,7 +3,7 @@ import { isPast, isNow } from '../utils/distance'
 export default function FilmCard({ film, nearest, locationStatus }) {
   const showDistance = locationStatus === 'granted' && nearest
 
-  const allTimes = nearest?.times ?? []
+  const allTimes = [...new Set(nearest?.times ?? [])]
   const hasFutureShowings = allTimes.some((t) => !isPast(t) || isNow(t))
 
   return (

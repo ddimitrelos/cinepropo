@@ -29,8 +29,10 @@ export function nearestCinema(showtimes, cinemas, userLat, userLng) {
   return best
 }
 
-// Parse "HH:MM" into minutes since midnight.
+// Parse "HH:MM" into minutes since midnight. Returns Infinity for unparseable input so
+// the show stays visible (isPast = false) rather than being silently hidden.
 export function parseMinutes(timeStr) {
+  if (!timeStr || !timeStr.includes(':')) return Infinity
   const [h, m] = timeStr.split(':').map(Number)
   return h * 60 + m
 }

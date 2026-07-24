@@ -43,6 +43,7 @@ export default function App() {
         // 3. Find nearest cinema that still has upcoming shows (fall back to pure distance)
         const futureSt = showtimes.filter((st) => st.times.some((t) => !isPast(t) || isNow(t)))
         const nearest = nearestCinema(futureSt.length > 0 ? futureSt : showtimes, cinemas, userLat, userLng)
+        if (!nearest) return null
 
         return { film, nearest }
       })
