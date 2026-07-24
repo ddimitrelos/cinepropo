@@ -1,3 +1,5 @@
+import { CINEMA_CUTOFF_HOUR } from '../constants'
+
 export function haversineKm(lat1, lng1, lat2, lng2) {
   const R = 6371
   const dLat = ((lat2 - lat1) * Math.PI) / 180
@@ -33,10 +35,13 @@ export function parseMinutes(timeStr) {
   return h * 60 + m
 }
 
-// Current time in minutes since midnight.
+// Current time in minutes since midnight, extended past midnight during the late-night window.
+// Between 00:00 and CINEMA_CUTOFF_HOUR, returns minutes + 1440 so evening showtimes still
+// compare correctly as past (e.g. at 00:05, nowMinutes() = 1445 > parseMinutes('22:00') = 1320).
 export function nowMinutes() {
   const d = new Date()
-  return d.getHours() * 60 + d.getMinutes()
+  const m = d.getHours() * 60 + d.getMinutes()
+  return d.getHours() < CINEMA_CUTOFF_HOUR ? m + 1440 : m
 }
 
 export function isPast(timeStr) {
