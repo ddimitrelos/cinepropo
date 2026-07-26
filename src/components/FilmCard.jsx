@@ -39,7 +39,7 @@ export default function FilmCard({ film, nearest, locationStatus }) {
         </span>
 
         {/* Cinema + distance */}
-        {nearest && (
+        {nearest && (locationStatus === 'granted' || locationStatus === 'denied') && (
           <div className="flex items-center gap-1.5 text-sm text-gray-300">
             {nearest.cinema.isSummer && <span title="Open-air cinema">☀️</span>}
             <span className="truncate">{nearest.cinema.name}</span>

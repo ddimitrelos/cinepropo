@@ -9,16 +9,23 @@ export function useGeolocation() {
       setState({ ...SYNTAGMA, status: 'denied' })
       return
     }
+    let cancelled = false
     navigator.geolocation.getCurrentPosition(
-      (pos) =>
+      (pos) => {
+        if (cancelled) return
         setState({
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
           status: 'granted',
-        }),
-      () => setState({ ...SYNTAGMA, status: 'denied' }),
+        })
+      },
+      () => {
+        if (cancelled) return
+        setState({ ...SYNTAGMA, status: 'denied' })
+      },
       { timeout: 8000, maximumAge: 60000 }
     )
+    return () => { cancelled = true }
   }, [])
 
   return state
